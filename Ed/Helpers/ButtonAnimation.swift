@@ -92,19 +92,23 @@ extension View{
     @ViewBuilder
     
     func wiggle(_ animate:Bool)-> some View{
-        self.keyframeAnimator(initialValue: CGFloat.zero, trigger: animate) { view, value in
-            view.offset(x:value)
-        } keyframes: { _ in
-            KeyframeTrack{
-                CubicKeyframe(0, duration: 0.1)
-                CubicKeyframe(-5, duration: 0.1)
-                CubicKeyframe(5, duration: 0.1)
-                CubicKeyframe(-5, duration: 0.1)
-                CubicKeyframe(5, duration: 0.1)
-                CubicKeyframe(-5, duration: 0.1)
-                CubicKeyframe(5, duration: 0.1)
-                CubicKeyframe(0, duration: 0.1)
+        if #available(iOS 17.0, *) {
+            self.keyframeAnimator(initialValue: CGFloat.zero, trigger: animate) { view, value in
+                view.offset(x:value)
+            } keyframes: { _ in
+                KeyframeTrack{
+                    CubicKeyframe(0, duration: 0.1)
+                    CubicKeyframe(-5, duration: 0.1)
+                    CubicKeyframe(5, duration: 0.1)
+                    CubicKeyframe(-5, duration: 0.1)
+                    CubicKeyframe(5, duration: 0.1)
+                    CubicKeyframe(-5, duration: 0.1)
+                    CubicKeyframe(5, duration: 0.1)
+                    CubicKeyframe(0, duration: 0.1)
+                }
             }
+        } else {
+            // Fallback on earlier versions
         }
     }
 }

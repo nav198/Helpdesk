@@ -16,6 +16,7 @@ enum API {
         case userProfile(userID: Int)
         case userLogin
         case refreshToken
+        case serviceHistory(projectID: Int)
         
         func url() -> URL {
             switch self {
@@ -33,6 +34,14 @@ enum API {
                 return API.baseURL.appendingPathComponent("user/login")
             case .refreshToken:
                    return API.baseURL.appendingPathComponent("user/refresh")
+            case .serviceHistory(projectID: let projectID):
+                var components = URLComponents(url: API.baseURL.appendingPathComponent("service-desk"), resolvingAgainstBaseURL: false)!
+                components.queryItems = [
+                    URLQueryItem(name: "project_id", value: "\(projectID)")
+                ]
+                
+                print("components.url! \(components.url!)")
+                return components.url!
             }
         }
     }

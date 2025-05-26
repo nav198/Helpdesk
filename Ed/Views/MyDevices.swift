@@ -102,15 +102,10 @@ struct MyDevicesView: View {
         isMyDevicesLoading = true
         Task {
             await devicesList.fetchData()
+            print("DATA OF MY DEVICES \(devicesList.devices)")
             isMyDevicesLoading = false
         }
     }
-    
-    func serviceHistory(){
-        
-    }
-    
-    
 }
 
 

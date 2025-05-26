@@ -90,7 +90,7 @@ struct DeviceDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         
         .sheet(isPresented: $showHalfSheet) {
-                MaintainanceRequest(device: device)
+            ServiceRequest(device: device)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
             }
@@ -205,12 +205,13 @@ struct DeviceDetailView: View {
     }
     
     private var infoItems: [(String, String)] {
-        [
+       
+        return [
             ("MAKE", device.itemMake ?? "Unknown"),
             ("MODEL", device.itemModelName ?? "N/A"),
-            ("SERVICE PROVIDER", "\(device.assetServiceProvider)"),
+            ("SERVICE PROVIDER", device.assetServiceProvider?.providerName ?? ""),
             ("CATEGORY", device.itemCategory ?? "Unknown"),
-            ("INSTALLATION DATE", device.backdatedDate ?? "Unknown"),
+            ("WARRANTY END DATE", convertToIST(from: device.warrantyEndDate ?? "")),
         ]
     }
 

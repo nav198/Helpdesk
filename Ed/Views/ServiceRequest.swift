@@ -6,7 +6,7 @@
 
 import SwiftUI
 
-struct MaintainanceRequest: View {
+struct ServiceRequest: View {
     @Environment(\.presentationMode) var presentationMode
 //    let device: DeviceCard
     let device: Results
@@ -23,11 +23,12 @@ struct MaintainanceRequest: View {
         VStack(spacing: 30) {
             VStack(alignment: .leading, spacing: 12) {
                 //                Text(device.deviceName)
-                Text("ACER M220")
+                
+                Text("\(device.itemMake ?? "")")
                 Divider()
-                Text("Projector")
+                Text("\(device.itemCategory ?? "")")
                 Divider()
-                Text("Serial - QWERTY 123")
+                Text("Serial - \(device.itemSerialNo ?? "")")
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -92,11 +93,21 @@ struct MaintainanceRequest: View {
         }
         .padding()
         .navigationTitle("Maintainance Request")
+        .onAppear{
+            callAPI()
+        }
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: CustomBackButton.view {
             presentationMode.wrappedValue.dismiss()
         })
         .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    func callAPI(){
+        print("device \(device.projectID ?? 0 )")
+        print("device \(device.itemCategory ?? "")")
+        
+       
     }
 }
 

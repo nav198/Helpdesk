@@ -37,7 +37,7 @@ enum MenuDestination: Hashable {
     case terms_conditions
     case privacy
     case share
-    case logout
+//    case logout
 }
 
 @available(iOS 14.0, *)
@@ -96,7 +96,6 @@ struct SideMenuView: View {
                 }
                 
                 MenuItem(icon: "arrow.backward.square", title: "Logout") {
-                    //                                   navigate(to: .logout)
                     showLogoutAlert = true
                 }
             }
@@ -158,12 +157,12 @@ struct ShareView: View {
     }
 }
 
-struct LogoutView: View {
-    @EnvironmentObject var appState: AppState
-    
-    var body: some View {
-        Button("Logout") {
-            appState.isLoggedIn = false
-        }
-    }
-}
+//struct LogoutView: View {
+//    @EnvironmentObject var appState: AppState
+//    
+//    var body: some View {
+//        Button("Logout") {
+//            appState.isLoggedIn = false
+//        }
+//    }
+//}

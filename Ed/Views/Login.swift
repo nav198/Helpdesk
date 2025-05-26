@@ -6,18 +6,21 @@
 //
 
 import SwiftUI
-//import GoogleSignInSwift
-//import GoogleSignIn
-//import FirebaseCore
-//import FirebaseAuth
 import AuthenticationServices
 import CryptoKit
 import AuthenticationServices
 
 
+enum Field {
+    case email
+    case password
+}
+
+
 @available(iOS 16.0, *)
 struct Login: View {
-    
+    @FocusState private var focusedField: Field?
+
     @State private var angle: Double = 0.0
     @State private var timer: Timer?
     @State private var showError = false
@@ -58,6 +61,7 @@ struct Login: View {
                     TextField("Email", text: $email)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
+                        .focused($focusedField, equals: .email)
                         .onChange(of: email) { newValue in
                             isEmailValid = validateEmail(newValue)
                         }
@@ -86,8 +90,10 @@ struct Login: View {
                     Group {
                         if isSecure {
                             SecureField("Password", text: $password)
+                                .focused($focusedField, equals: .password)
                         } else {
                             TextField("Password", text: $password)
+                                .focused($focusedField, equals: .password)
                         }
                     }
                     
@@ -111,29 +117,29 @@ struct Login: View {
                         .foregroundColor(.red)
                 }
                 
- 
                 if showError {
                     Text("Please enter both email and password")
                         .foregroundColor(.red)
                 }
                 
-             
                 CustomButton{
                     HStack(spacing:10){
                         Text("Login")
                         Image(systemName: "chevron.right")
                     }
-                    
                     .foregroundStyle(Color.green)
                     .fontWeight(.bold)
                 }action: {
-                   await callLogin()
+                focusedField = nil
+                    try? await Task.sleep(nanoseconds: 100_000_000) // 0.3s delay
+                   return await callLogin()
                 }
-               
-             
-                
                 Spacer()
-                
+            }
+            .onAppear{
+                DispatchQueue.main.asyncAfter(deadline: .now()+0.3, execute: {
+                    focusedField = .email
+                })
             }
             .padding(.top,50)
             .background(
@@ -145,27 +151,23 @@ struct Login: View {
     }
     
     func callLogin() async -> TaskStatus {
+      
         guard !email.isEmpty, !password.isEmpty else {
             ToastManager.shared.show(message: "Email and password required", type: .success)
             return .failed("Login Failed")
         }
-        
-        print("NEWWWWW")
-        
+                
         let success = await loginVM.loginUser(email, password)
 
         if success {
-
             ToastManager.shared.show(message: "Login successful!", type: .success)
             try? await Task.sleep(nanoseconds: 1_500_000_000)
             onLoginSuccess()
             appState.isLoggedIn = true
-            
             return .success
         } else {
             let errorMsg = loginVM.errorMessage ?? "Login failed. Please try again."
             ToastManager.shared.show(message: errorMsg, type: .failure)
-            
             return .failed(errorMsg)
         }
     }
@@ -177,6 +179,6 @@ struct Login: View {
             print("Login succeeded (Preview)")
         }
     } else {
-        // Fallback on earlier versions
+        
     }
 }

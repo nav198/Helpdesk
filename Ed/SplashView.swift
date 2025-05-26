@@ -73,10 +73,12 @@ struct SplashView: View {
                                     }) {
                                         Image(systemName: "line.horizontal.3")
                                             .imageScale(.large)
-                                            .foregroundStyle(Color.white)
+                                            .padding(10)
                                     }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
+
                             .navigationBarBackButtonHidden(true)
                         if isMenuOpen {
                             Color.black.opacity(0.3)
@@ -117,7 +119,7 @@ struct SplashView: View {
                 case .terms_conditions: TermsConditionsView()
                 case .privacy: PrivacyView()
                 case .share: ShareView()
-                case .logout: LogoutView()
+//                case .logout: LogoutView()
                 }
             }
         }
