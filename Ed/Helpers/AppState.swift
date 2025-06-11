@@ -13,3 +13,10 @@ import SwiftUI
 class AppState: ObservableObject {
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
 }
+
+extension AppState {
+    func performLogout(path: Binding<NavigationPath>) {
+        self.isLoggedIn = false
+        path.wrappedValue = NavigationPath()
+    }
+}

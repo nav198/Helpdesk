@@ -74,17 +74,8 @@ struct CustomButton<ButtonContent: View>: View {
                 }
                 .wiggle(wiggle)
         })
-
         .disabled(isLoading)
-//        .popover(isPresented: $showPopup, content: {
-//            Text(popupMesage)
-//                .font(.caption)
-//                .foregroundStyle(.gray)
-//                .padding(.horizontal,10)
-//                .presentationCompactAdaptation(.popover)
-//        })
         .animation(.snappy, value: isLoading)
-//        .animation(.snappy, value: taskStatus)
     }
 }
 

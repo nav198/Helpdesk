@@ -10,52 +10,6 @@ import SwiftUI
 import StoreKit
 import CryptoKit
 
-struct DeviceCard: Identifiable {
-    let id = UUID()
-    let deviceName: String
-    let deviceType: String
-    let model: String
-}
-
-struct DeviceCardView: View {
-    let device: DeviceCard
-    var body: some View {
-        HStack(alignment: .center, spacing: 16) {
-            Image("cpu")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 90, height: 90)
-                .background(Color.green)
-                .clipShape(Circle())
-                .padding(.leading, 20)
-            VStack(alignment: .leading, spacing: 4) {
-                Text(device.deviceName.uppercased())
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                
-                Text(device.deviceType.uppercased())
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Text("Serial-\(device.model)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-        }
-        .padding(.vertical, 16)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Color.gray.opacity(0.2)))
-        .cornerRadius(12)
-        .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
-        .padding(.horizontal, 20)
-    }
-}
-
-
-#Preview {
-    DeviceCardView(device: DeviceCard(deviceName: "M229", deviceType: "CPU", model: "Acer 1234"))
-}
 
 struct CustomBackButton {
     static func view(action: @escaping () -> Void) -> some View {

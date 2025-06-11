@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-//import FirebaseAuth
 
 struct ForgotPasswordView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -54,14 +53,7 @@ struct ForgotPasswordView: View {
                         .padding(.horizontal, -10)
                 }
                 
-//                AnimatedLoginButton(title: "Submit") {
-//                    onLoginSuccess()
-//                    appState.isLoggedIn = true
-//                }
-//                .frame(height: 50)
-//                .padding(.horizontal, 25)
-//                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                
+    
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
                 }) {

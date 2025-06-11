@@ -11,7 +11,11 @@ struct DeviceDetailView: View {
     @Environment(\.presentationMode) var presentationMode
     let device: Results
     @State private var showHalfSheet = false
-
+    @StateObject private var serviceHistory = ServiceHistoryVM()
+    @State private var isMyDevicesLoading = false
+    
+    @State var serviceHistoryList : [ServiceHistoryData] = []
+    
     @State private var selectedTab: Tab = .details
     var data = ["USER MANUAL", "REQUEST FOR SERVICE", "FAQ"]
     let images = ["applelogo", "leaf", "cart.fill"]
@@ -20,8 +24,9 @@ struct DeviceDetailView: View {
     }
     
     var body: some View {
-        ZStack{
+        ZStack {
             VStack(spacing: 18) {
+                // Tabs
                 HStack(spacing: 12) {
                     tabButton(title: "Details", isSelected: selectedTab == .details) {
                         selectedTab = .details
@@ -34,53 +39,22 @@ struct DeviceDetailView: View {
                 .padding(.top)
                 
                 // Tab Content
-                if selectedTab == .details {
-                    deviceDetailsView
-                } else {
-                    serviceHistoryView
+                Group {
+                    if selectedTab == .details {
+                        deviceDetailsView
+                    } else {
+                        serviceHistoryView
+                    }
+                }
+                .animation(.easeInOut, value: selectedTab)
+
+                Spacer()
+                if selectedTab == .details{
+                    bottomButtonsView
                 }
                 
-                Spacer()
-                bottomButtonsView
-
-//                HStack(spacing: 12) {
-//                    ForEach(buttonsData, id: \.title) { item in
-//                        Button(action: {
-//                            print("Tapped on \(item.title)")
-//                            
-//                            if item.title == "SERVICE" {
-//                                print("ITEM TITLE IS \(item.title)")
-//                                showHalfSheet = true
-//                            }
-//                            
-//                        }) {
-//                            VStack {
-//                                Spacer(minLength: 10)
-//                                
-//                                Image(systemName: item.icon)
-//                                    .resizable()
-//                                    .scaledToFit()
-//                                    .frame(width: 24, height: 24)
-//                                    .foregroundColor(.white)
-//                                
-//                                Spacer(minLength: 8)
-//                                
-//                                Text(item.title)
-//                                    .font(.footnote)
-//                                    .foregroundColor(.white)
-//                                
-//                                Spacer()
-//                            }
-//                            .frame(height: 80)
-//                            .frame(maxWidth: .infinity)
-//                            .background(Color.green.opacity(0.7))
-//                            .clipShape(RoundedRectangle(cornerRadius: 20))
-//                        }
-//                    }
-//                }
-//                .padding(.horizontal)
-//                .padding(.bottom, 50)
             }
+//            .loadingOverlay(isShowing: isMyDevicesLoading)
         }
         .navigationTitle(device.itemModelName ?? "")
         .navigationBarBackButtonHidden(true)
@@ -88,13 +62,27 @@ struct DeviceDetailView: View {
             presentationMode.wrappedValue.dismiss()
         })
         .navigationBarTitleDisplayMode(.inline)
-        
         .sheet(isPresented: $showHalfSheet) {
             ServiceRequest(device: device)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
-            }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
     }
+    
+    func serviceHistoryAPI() {
+        isMyDevicesLoading = true
+        Task {
+            await serviceHistory.fetchData()
+
+            if let allHistory = serviceHistory.serviceHistoryData {
+                let filtered = allHistory.filter { $0.asset?.id == device.id }
+                self.serviceHistoryList = filtered
+            }
+            isMyDevicesLoading = false
+        }
+    }
+
+
     
     private func toDeviceCard() -> DeviceCard {
         DeviceCard(
@@ -137,7 +125,6 @@ struct DeviceDetailView: View {
         .padding(.bottom, 50)
     }
 
-    
     // MARK: - Reusable tab button
     private func tabButton(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
@@ -184,25 +171,75 @@ struct DeviceDetailView: View {
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(.systemGray5))
-                    .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+//                    .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
             )
             .padding(.horizontal)
         }
     }
     
     private var serviceHistoryView: some View {
-        VStack {
-            Text("Service history goes here...")
-                .padding()
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if serviceHistoryList.isEmpty {
+                    Text("No service history available.")
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                } else {
+                    ForEach(serviceHistoryList, id: \.id) { history in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Ticket #\(history.id)")
+                                    .font(.headline)
+                                Spacer()
+                                if history.status.lowercased() == "open" {
+                                    Text(history.status.capitalized)
+                                        .font(.subheadline)
+                                        .foregroundColor(.red)
+                                }else{
+                                    Text(history.status.capitalized)
+                                        .font(.subheadline)
+                                        .foregroundColor(.green)
+                                }
+                               
+                            }
+
+                            if let asset = history.asset {
+                                Text("Asset: \(asset.itemMake) \(asset.itemModelName)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+
+                                Text("Serial No: \(asset.itemSerialNo)")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+
+                            Text("Problem: \(history.problem_category) > \(history.problem_sub_category)")
+                                .font(.subheadline)
+
+                            Text("Description: \(history.problem_description)")
+                                .font(.caption)
+
+                            Text("Opened: \(convertToIST(from: "\(history.open_date)"))")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(.systemGray5))
+                        )
+                    }
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
-        )
-        .padding(.horizontal)
+        .loadingOverlay(isShowing: isMyDevicesLoading)
+        .onAppear {
+            serviceHistoryAPI()
+        }
     }
+
     
     private var infoItems: [(String, String)] {
        
@@ -217,14 +254,6 @@ struct DeviceDetailView: View {
 
 }
 
-// MARK: - Preview
-//struct DeviceDetailView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            DeviceDetailView(device: DeviceCard(deviceName: "ACER M220", deviceType: "TFT", model: "MMRE8700377"))
-//        }
-//    }
-//}
 
 
 struct ButtonItem {

@@ -13,7 +13,6 @@ struct Dashboard: View {
     private let menuItems: [SupportMenuItem] = [
         .init(title: "My Devices", iconName: "desktopcomputer", borderColor: .red, destination: AnyView(MyDevicesView())),
         .init(title: "Service History", iconName: "gearshape.fill", borderColor: .green, destination: AnyView(ServiceHistory())),
-//        .init(title: "Service Requests", iconName: "gearshape.fill", borderColor: .green, destination: AnyView(MaintainanceRequest( device: DeviceCard(deviceName: "", deviceType: "", model: "11")))),
         .init(title: "FAQs", iconName: "questionmark.circle.fill", borderColor: .yellow, destination: AnyView(FAQsView())),
         .init(title: "Contact", iconName: "info.circle", borderColor: .blue, destination: AnyView(ContactView()))
     ]

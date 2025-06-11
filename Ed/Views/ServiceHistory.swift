@@ -6,37 +6,6 @@
 //
 
 import SwiftUI
-//
-//struct ServiceHistory: View {
-//    @State private var isServiceHistoryLoading = false
-//    @Environment(\.presentationMode) var presentationMode
-//    @State private var searchText = ""
-//    @StateObject private var serviceHistory = ServiceHistoryVM()
-//
-//    var body: some View {
-//        VStack{
-//            
-//        }
-//        .onAppear{
-//            serviceHistoryAPI()
-//        }
-//    }
-//    
-//    func serviceHistoryAPI() {
-//        isServiceHistoryLoading = true
-//        Task {
-//          await serviceHistory.fetchData()
-//            print("serviceHistory \(serviceHistory.serviceHistoryData)")
-//            isServiceHistoryLoading = false
-//        }
-//    }
-//}
-//
-//#Preview {
-//    ServiceHistory()
-//}
-
-import SwiftUI
 
 struct ServiceHistory: View {
     @State private var isServiceHistoryLoading = false
@@ -79,8 +48,8 @@ struct ServiceHistory: View {
                             Text("Reported by: \(item.complaint_by_user)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-
-                            Text("Open Date: \(formattedDate(item.open_date))")
+                            
+                            Text("Open Date: \(convertToIST(from: formattedDate(item.open_date)))")
                                 .font(.caption2)
                                 .foregroundColor(.gray)
                         }

@@ -118,10 +118,13 @@ struct SplashView: View {
                 case .contact: ContactView()
                 case .terms_conditions: TermsConditionsView()
                 case .privacy: PrivacyView()
-                case .share: ShareView()
-//                case .logout: LogoutView()
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
+            appState.isLoggedIn = false
+            path = NavigationPath()
+            showLogin = true
         }
     }
 }

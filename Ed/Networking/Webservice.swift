@@ -8,67 +8,6 @@
 import Foundation
 import Foundation
 
-enum API {
-    static let baseURL = URL(string: "http://13.203.78.74:3000/api/v1")!
-    
-    enum Endpoint {
-        case devicesList(projectID: Int)
-        case userProfile(userID: Int)
-        case userLogin
-        case refreshToken
-        case serviceHistory(projectID: Int)
-        
-        func url() -> URL {
-            switch self {
-            case .devicesList(let projectID):
-                var components = URLComponents(url: API.baseURL.appendingPathComponent("asset"), resolvingAgainstBaseURL: false)!
-                components.queryItems = [
-                    URLQueryItem(name: "project_id", value: "\(projectID)")
-                ]
-                
-                print("components.url! \(components.url!)")
-                return components.url!
-            case .userProfile(let userID):
-                return API.baseURL.appendingPathComponent("user/profile/\(userID)")
-            case .userLogin:
-                return API.baseURL.appendingPathComponent("user/login")
-            case .refreshToken:
-                   return API.baseURL.appendingPathComponent("user/refresh")
-            case .serviceHistory(projectID: let projectID):
-                var components = URLComponents(url: API.baseURL.appendingPathComponent("service-desk"), resolvingAgainstBaseURL: false)!
-                components.queryItems = [
-                    URLQueryItem(name: "project_id", value: "\(projectID)")
-                ]
-                
-                print("components.url! \(components.url!)")
-                return components.url!
-            }
-        }
-    }
-}
-
-
-enum NetworkError: Error, LocalizedError {
-    case invalidURL
-    case requestFailed
-    case invalidResponse
-    case statusCode(Int)
-    case decodingError
-    case unauthorized
-    
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL: return "The URL is invalid."
-        case .requestFailed: return "The request failed."
-        case .invalidResponse: return "Invalid response from server."
-        case .statusCode(let code): return "Unexpected status code: \(code)"
-        case .decodingError: return "Failed to decode the response."
-        case .unauthorized:
-            return "Unauthorised access"
-        }
-    }
-}
-
 final class WebService {
     static let shared = WebService()
     private init() {}
@@ -94,15 +33,17 @@ final class WebService {
                }
 
                if httpResponse.statusCode == 401 && retryOnAuthFail {
+                  
                    print("🔄 Token expired, attempting to refresh...")
-                   let refreshResult = await refreshAccessToken()
-                   switch refreshResult {
-                   case .success:
-                       // Retry original request
-                       return await performAuthorizedRequest(url: url, decodeTo: type, retryOnAuthFail: false)
-                   case .failure:
-                       return .failure(.unauthorized)
-                   }
+                   
+                   LogoutManager.performLogout()
+//                   let refreshResult = await refreshAccessToken()
+//                   switch refreshResult {
+//                   case .success:
+//                       return await performAuthorizedRequest(url: url, decodeTo: type, retryOnAuthFail: false)
+//                   case .failure:
+//                       return .failure(.unauthorized)
+//                   }
                }
 
                guard (200..<300).contains(httpResponse.statusCode) else {
@@ -173,10 +114,8 @@ extension WebService {
                 return .failure(.statusCode(httpResponse.statusCode))
             }
 
-            // Decode new tokens
             let tokenResponse = try JSONDecoder().decode(LoginDataResponse.self, from: data)
 
-            // Save them
             KeychainHelper.shared.save(tokenResponse.data.access_token, key: "accessToken")
             KeychainHelper.shared.save(tokenResponse.data.refresh_token, key: "refreshToken")
 

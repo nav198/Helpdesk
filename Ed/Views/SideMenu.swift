@@ -36,8 +36,6 @@ enum MenuDestination: Hashable {
     case contact
     case terms_conditions
     case privacy
-    case share
-//    case logout
 }
 
 @available(iOS 14.0, *)
@@ -46,13 +44,15 @@ struct SideMenuView: View {
     @Binding var isMenuOpen: Bool
     @Binding var path: NavigationPath
     @State private var showLogoutAlert = false
+    @State private var isShowingShareSheet = false
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 Spacer()
-                Image(systemName: "person.circle.fill")
+                Image("personImg")   
                     .resizable()
-                    .frame(width: 80, height: 80)
+                    .frame(width: 100, height: 100)
                     .foregroundColor(.yellow)
                     .padding(.top,50)
                 Spacer()
@@ -76,7 +76,7 @@ struct SideMenuView: View {
                 }
                 
                 MenuItem(icon: "phone", title: "Contact Us") {
-                    navigate(to: .contact)
+                    sendEmail(to: "info@edique.in")
                 }
                 
                 MenuItem(icon: "doc.text", title: "Terms & Conditions") {
@@ -92,7 +92,8 @@ struct SideMenuView: View {
                 }
                 
                 MenuItem(icon: "square.and.arrow.up", title: "Share") {
-                    navigate(to: .share)
+//                    navigate(to: .share)
+                    isShowingShareSheet = true
                 }
                 
                 MenuItem(icon: "arrow.backward.square", title: "Logout") {
@@ -101,6 +102,12 @@ struct SideMenuView: View {
             }
             Spacer()
         }
+        .sheet(isPresented: $isShowingShareSheet) {
+                ShareSheet(activityItems: [
+                    "Check out this awesome app!",
+                    URL(string: "https://apps.apple.com/app/id1234567890")!
+                ])
+            }
         .frame(width: 260)
         .background(LinearGradient(colors: [.blue, .green], startPoint: .top, endPoint: .bottom))
         .edgesIgnoringSafeArea(.all)
@@ -116,6 +123,7 @@ struct SideMenuView: View {
             )
         }
     }
+
     
     private func navigate(to destination: MenuDestination) {
         withAnimation {
@@ -126,43 +134,11 @@ struct SideMenuView: View {
             path.append(destination)
         }
     }
+    
+    private func sendEmail(to address: String) {
+           if let url = URL(string: "mailto:\(address)") {
+               UIApplication.shared.open(url)
+           }
+       }
 }
 
-struct AboutView: View {
-    var body: some View {
-        Text("About Us")
-            .navigationTitle("About Us")
-    }
-}
-
-
-struct TermsConditionsView: View {
-    var body: some View {
-        Text("Terms & Conditions")
-            .navigationTitle("Terms & Conditions")
-    }
-}
-
-struct PrivacyView: View {
-    var body: some View {
-        Text("Privacy Policy")
-            .navigationTitle("Privacy Policy")
-    }
-}
-
-struct ShareView: View {
-    var body: some View {
-        Text("Share App")
-            .navigationTitle("Share")
-    }
-}
-
-//struct LogoutView: View {
-//    @EnvironmentObject var appState: AppState
-//    
-//    var body: some View {
-//        Button("Logout") {
-//            appState.isLoggedIn = false
-//        }
-//    }
-//}

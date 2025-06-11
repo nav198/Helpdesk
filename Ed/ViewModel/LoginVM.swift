@@ -22,7 +22,7 @@ class UserLoginVM: ObservableObject {
         errorMessage = nil
 
         let url = API.Endpoint.userLogin.url()
-        let loginBody = LoginRequest(email: email, password: password)
+        let loginBody = LoginRequest(email: email.lowercased(), password: password)
 
         let result: Result<LoginDataResponse, NetworkError> =
             await webService.postData(to: url, body: loginBody, responseType: LoginDataResponse.self)
@@ -35,7 +35,7 @@ class UserLoginVM: ObservableObject {
             handleLoginSuccess(response: response)
             return true
         case .failure(let error):
-            errorMessage = "Login failed: \(error.localizedDescription)"
+            errorMessage = "Login failed: Please try later"
             return false
         }
     }

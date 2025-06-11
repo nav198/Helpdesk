@@ -153,7 +153,7 @@ struct Login: View {
     func callLogin() async -> TaskStatus {
       
         guard !email.isEmpty, !password.isEmpty else {
-            ToastManager.shared.show(message: "Email and password required", type: .success)
+            ToastManager.shared.show(message: "Email and password required", type: .failure)
             return .failed("Login Failed")
         }
                 

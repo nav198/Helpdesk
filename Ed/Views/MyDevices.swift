@@ -13,6 +13,7 @@ struct MyDevicesView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
     @StateObject private var devicesList = DevicesListVM()
+    @StateObject private var serviceHistory = ServiceHistoryVM()
 
     var filteredDevices: [Results] {
         guard let results = devicesList.devices else { return [] }
@@ -51,7 +52,6 @@ struct MyDevicesView: View {
                         )
                 }
 
-                // 📦 Device Count
                 Text("\(filteredDevices.count) devices found")
                     .font(.body)
                     .foregroundColor(.primary)
@@ -62,13 +62,12 @@ struct MyDevicesView: View {
                     .cornerRadius(25)
                     .padding(.horizontal, 50)
 
-                // 📋 Device List
                 ScrollView {
                     VStack(spacing: 16) {
                         ForEach(filteredDevices, id: \.id) { device in
                             NavigationLink(destination: DeviceDetailView(device: device)) {
                                 let card = DeviceCard(
-                                    deviceName: device.itemMake ?? "Unknown",
+                                    deviceName: device.itemModelName ?? "Unknown",
                                     deviceType: device.itemCategory ?? "Unknown",
                                     model: device.itemModelName ?? "N/A"
                                 )
@@ -102,8 +101,16 @@ struct MyDevicesView: View {
         isMyDevicesLoading = true
         Task {
             await devicesList.fetchData()
-            print("DATA OF MY DEVICES \(devicesList.devices)")
+//            serviceHistoryAPI()
             isMyDevicesLoading = false
+        }
+    }
+    
+    func serviceHistoryAPI() {
+        Task {
+            await serviceHistory.fetchData()
+//            print("ID ====> ",serviceHistory.serviceHistoryData)
+//            isMyDevicesLoading = false
         }
     }
 }

@@ -15,8 +15,8 @@ class CustomAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
     var app: Ed?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        application.registerForRemoteNotifications()
-        UNUserNotificationCenter.current().delegate = self
+//        application.registerForRemoteNotifications()
+//        UNUserNotificationCenter.current().delegate = self
         return true
     }
     
